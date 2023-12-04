@@ -1,0 +1,40 @@
+{
+  "$schema": "./devDependencies/schemas/manifestSchema.json",
+  "name": "Uptail.Commerce",
+  "publisher": "Uptail",
+  "version": "1.0.0",
+  "minimumPosVersion": "9.28.0.0",
+  "description": "An extension package containing POS samples to showcase how to create a Store Commerce Extension Package and Installer.",
+  "dependencies": [
+    {
+      "alias": "knockout",
+      "format": "amd",
+      "modulePath": "Libraries/knockout"
+    }
+  ],
+  "components": {
+    "extend": {},
+    "create": {
+      "operations": [
+        {
+          "operationId": "10050",
+          "operationRequestFactoryPath": "Operations/ShowLegacyPurchases/ShowLegacyPurchasesRequestFactory",
+          "operationRequestHandlerPath": "Operations/ShowLegacyPurchases/ShowLegacyPurchasesRequestHandler",
+          "description": "Show legacy purchases from old system",
+          "name": "Show legacy sales"
+        }
+      ],
+      "views": [
+        {
+          "title": "Show legacy purchases",
+          "pageName": "ShowLegacyPurchasesView",
+          "phonePageName": "ShowLegacyPurchasesView",
+          "viewDirectory": "Views/ShowLegacyPurchases/",
+          "viewControllerPath": "Views/ShowLegacyPurchases/ShowLegacyPurchasesView",
+          "description": "Show legacy purchases",
+          "name": "Show legacy purchases"
+        }
+      ]
+    }
+  }
+}
