@@ -5,11 +5,20 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Uptail.CommerceRuntime.Messages;
 using Uptail.CommerceRuntime.DataModels;
+using System.Net.Http;
+using System.Runtime.Serialization.Json;
+using System.Linq;
+using System.Text;
+using System.IO;
+using RequestPayload;
+
 
 namespace Uptail.CommerceRuntime.Services
 {
     public class ExtendedCustomerService : IRequestHandlerAsync
     {
+        private readonly string _url = "";
+
         public IEnumerable<Type> SupportedRequestTypes
         {
             get => new[] { typeof(GetCustomerLegacyPurchasesRequest) };
@@ -28,25 +37,65 @@ namespace Uptail.CommerceRuntime.Services
             }
         }
 
-        private Task<Response> GetCustomerLegacyPurchasesAsync(GetCustomerLegacyPurchasesRequest request)
+        private async Task<Response> GetCustomerLegacyPurchasesAsync(GetCustomerLegacyPurchasesRequest request)
         {
-            var transactions = new List<LegacySalesTransaction>
+            var legacyTransactions = new List<LegacyCustomerOrder>();
+            var payload = new LegacyCustomerOrderPayload
             {
-                new LegacySalesTransaction() { ItemNumber = "00020", Amount = 100, Description = "Test", Price = 10, TransactionId = "RS_001", SalesDateTime = DateTime.Now.AddDays(-120)  },
-                new LegacySalesTransaction() { ItemNumber = "00022", Amount = 2100, Description = "Test", Price = 30, TransactionId = "RS_002" },
-                new LegacySalesTransaction() { ItemNumber = "03020", Amount = 300, Description = "Test", Price = 430, TransactionId = "RS_003" },
-                new LegacySalesTransaction()
-                {
-                    ItemNumber = "00032",
-                    Amount = 400,
-                    Description = "Test",
-                    Price = 10,
-                    SalesDateTime = DateTime.Now.AddDays(-200),
-                    TransactionId  = "RS_004"
-                }
+                CustomerId = request.CustomerId
             };
 
-            return Task.FromResult<Response>(new GetCustomerLegacyPurchasesResponse(transactions));
+            try
+            {
+
+                using (var client = new HttpClient())
+                {
+                    var requestSerializer = new DataContractJsonSerializer(typeof(LegacyCustomerOrderPayload));
+                    var responseSerializer = new DataContractJsonSerializer(typeof(List<LegacyCustomerOrder>));
+
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        requestSerializer.WriteObject(memoryStream, payload);
+                        memoryStream.Position = 0;
+                        using (var streamReader = new StreamReader(memoryStream))
+                        {
+                            var jsonPayload = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+                            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                            var response = await client.PostAsync(_url, content).ConfigureAwait(false);
+                            streamReader.Close();
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                                using (var responseMemoryStream = new MemoryStream(Encoding.UTF8.GetBytes(responseJson)))
+                                {
+                                    legacyTransactions = (List<LegacyCustomerOrder>)responseSerializer.ReadObject(responseMemoryStream);
+                                    responseMemoryStream.Close();
+                                }
+                            }
+
+                            content.Dispose();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error:", ex);
+            }
+
+            List<LegacySalesTransaction> transactions = legacyTransactions.Select(transaction => new LegacySalesTransaction()
+            {
+                ItemNumber = transaction.ItemId,
+                Amount = transaction.Amount,
+                Description = "",
+                Price = transaction.Price,
+                SalesDateTime = DateTime.Parse(transaction.Date),
+                TransactionId = ""
+            }).ToList();
+
+            return new GetCustomerLegacyPurchasesResponse(transactions);
         } 
     }
 }

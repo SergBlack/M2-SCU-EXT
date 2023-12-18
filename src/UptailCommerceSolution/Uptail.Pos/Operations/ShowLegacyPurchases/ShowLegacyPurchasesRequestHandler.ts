@@ -23,7 +23,7 @@ export default class ShowLegacyPurchasesRequestHandler
 
         if (!isNullEmptyOrWhitespace(customerIdEntryResult)) {
             var manager = new SalesTransactionsManager(this.context, this.context.logger.getNewCorrelationId());
-            var transactionsResult = await manager.readLegacyTransactions("1001");
+            var transactionsResult = await manager.readLegacyTransactions(customerIdEntryResult);
 
             if (transactionsResult != null && !transactionsResult.canceled && transactionsResult.data != undefined && transactionsResult.data.length != 0) {
                 this.context.navigator.navigate("ShowLegacyPurchasesView", { transactions: transactionsResult.data });
