@@ -20,11 +20,6 @@ export default class DialogUtilities {
                 title: title,
                 message: message,
                 showCloseX: true,
-                button1: {
-                    id: "Button1Close",
-                    label: context.resources.getString("OKButtonLabel"),
-                    result: "OK"
-                }
             };
 
             await context.runtime.executeAsync(new ShowMessageDialogClientRequest<ShowMessageDialogClientResponse>(options));

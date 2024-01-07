@@ -1,6 +1,6 @@
 ﻿import { ExtensionOperationRequestType, ExtensionOperationRequestHandlerBase } from "PosApi/Create/Operations";
 import { ShowLegacyPurchasesOperationRequest, ShowLegacyPurchasesOperationResponse } from "../../OperationRequests";
-import { ClientEntities } from "PosApi/Entities"; 
+import { ClientEntities } from "PosApi/Entities";
 import { SalesTransactionsManager } from "../../Managers/SalesTransactionsManager";
 import DialogUtilities from "../../Utils/DialogUtilities";
 import { isNullEmptyOrWhitespace } from "../../Utils/StringUtilities";
@@ -29,7 +29,11 @@ export default class ShowLegacyPurchasesRequestHandler
                 this.context.navigator.navigate("ShowLegacyPurchasesView", { transactions: transactionsResult.data });
             }
             else {
-                //todo: show info message that transactions are missing
+                await DialogUtilities.showInfoMessage(
+                    this.context,
+                    `Customer: ${customerIdEntryResult}`,
+                    'No transactions found',
+                );
             } 
         } 
 

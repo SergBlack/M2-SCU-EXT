@@ -41,29 +41,61 @@ export default class ShowLegacyPurchasesView extends KnockoutCustomViewControlle
             {
                 columns: [
                     {
-                        collapseOrder: 3,
+                        collapseOrder: 7,
                         computeValue: (line: Entities.LegacySalesTransaction): string => { return emptyIfNull(line.TransactionId); },
                         isRightAligned: false,
                         minWidth: 150,
-                        ratio: 40,
+                        ratio: 20,
                         title: "Transaction"
                     },
                     {
-                        collapseOrder: 2,
+                        collapseOrder: 6,
                         computeValue: (line: Entities.LegacySalesTransaction): string => { return dateToShortString(line.SalesDateTime); },
                         isRightAligned: false,
                         minWidth: 70,
-                        ratio: 40,
+                        ratio: 20,
                         title: "Date"
                     },
                     {
-                        collapseOrder: 1,
+                        collapseOrder: 5,
                         computeValue: (line: Entities.LegacySalesTransaction): string => { return emptyIfNull(line.ItemNumber); },
                         isRightAligned: false,
                         minWidth: 40,
                         ratio: 20,
                         title: "Product"
-                    }
+                    },
+                    {
+                        collapseOrder: 4,
+                        computeValue: (line: Entities.LegacySalesTransaction): string => { return line.Price.toString(); },
+                        isRightAligned: false,
+                        minWidth: 40,
+                        ratio: 10,
+                        title: "Price"
+                    },
+                    {
+                        collapseOrder: 3,
+                        computeValue: (line: Entities.LegacySalesTransaction): string => { return ''; },
+                        isRightAligned: false,
+                        minWidth: 40,
+                        ratio: 10,
+                        title: "Currency"
+                    },
+                    {
+                        collapseOrder: 2,
+                        computeValue: (line: Entities.LegacySalesTransaction): string => { return line.Quantity.toString(); },
+                        isRightAligned: false,
+                        minWidth: 40,
+                        ratio: 10,
+                        title: "Quantity"
+                    },
+                    {
+                        collapseOrder: 1,
+                        computeValue: (line: Entities.LegacySalesTransaction): string => { return line.Amount.toString(); },
+                        isRightAligned: false,
+                        minWidth: 40,
+                        ratio: 10,
+                        title: "Amount"
+                    },
                 ],
                 data: [],
                 interactionMode: DataListInteractionMode.SingleSelect,
